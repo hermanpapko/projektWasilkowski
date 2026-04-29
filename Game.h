@@ -18,6 +18,7 @@ private:
 
     bool m_isRunning;
     std::string m_input;
+    std::string m_lastAction;
 };
 
 #endif
