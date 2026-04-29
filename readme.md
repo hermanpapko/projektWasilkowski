@@ -116,7 +116,7 @@ g++ main.cpp -o DungeonGame.exe
 <p>Projekt został zrealizowany przy użyciu modelu <b>Feature Branching</b>.</p>
 <ul>
   <li><b>Herman Papko</b> Silnik graficzny, system mapy.</li>
-  <li><b>Darya Parusova</b> Logika walki, system przedmiotów.</li>
+  <li><b>Darya Parusava</b> Logika walki, system przedmiotów.</li>
 </ul>
 
 <p align="right"><i>Projekt stworzony na potrzeby zaliczenia przedmiotu Programowanie C++.</i></p>
