@@ -1,17 +1,16 @@
 #include "Game.h"
 #include <iostream>
 
-Game::Game() : m_isRunning(true), m_input(""), m_lastAction("None") {}
+Game::Game() : m_isRunning(true), m_currentCommand(Command::NONE), m_lastAction("None") {}
 
 Game::~Game() {}
 
 void Game::run() {
     std::cout << "Game Started!" << std::endl;
-    std::cout << "Controls: W (Up), A (Left), S (Down), D (Right), Q (Quit)" << std::endl;
-    std::cout << "Press Enter after each key (Temporary)" << std::endl;
+    std::cout << "Controls: WASD to move, Q to quit." << std::endl;
 
     while (m_isRunning) {
-        processInput();
+        m_currentCommand = m_inputHandler.handleInput();
         update();
         render();
     }
@@ -19,32 +18,35 @@ void Game::run() {
     std::cout << "Game Over. Goodbye!" << std::endl;
 }
 
-void Game::processInput() {
-    std::cout << "Input: ";
-    std::cin >> m_input;
-}
-
 void Game::update() {
-    if (m_input == "q" || m_input == "Q") {
-        m_isRunning = false;
-    } else if (m_input == "w" || m_input == "W") {
-        m_lastAction = "Moving Up";
-    } else if (m_input == "s" || m_input == "S") {
-        m_lastAction = "Moving Down";
-    } else if (m_input == "a" || m_input == "A") {
-        m_lastAction = "Moving Left";
-    } else if (m_input == "d" || m_input == "D") {
-        m_lastAction = "Moving Right";
+    switch (m_currentCommand) {
+        case Command::UP:
+            m_lastAction = "Moving Up";
+            break;
+        case Command::DOWN:
+            m_lastAction = "Moving Down";
+            break;
+        case Command::LEFT:
+            m_lastAction = "Moving Left";
+            break;
+        case Command::RIGHT:
+            m_lastAction = "Moving Right";
+            break;
+        case Command::QUIT:
+            m_isRunning = false;
+            break;
+        case Command::NONE:
+        default:
+            break;
     }
 }
 
 void Game::render() {
     if (m_isRunning) {
         clearConsole();
-        std::cout << "--- Game Engine ---" << std::endl;
-        std::cout << "Last Key: " << m_input << std::endl;
+        std::cout << "--- Game Engine (Refactored) ---" << std::endl;
         std::cout << "Action:   " << m_lastAction << std::endl;
-        std::cout << "-------------------" << std::endl;
+        std::cout << "--------------------------------" << std::endl;
         std::cout << "Press Q to quit." << std::endl;
     }
 }
