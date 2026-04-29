@@ -1,6 +1,11 @@
 #include <iostream>
 #include <string>
 
+void clearConsole() {
+    // ANSI escape codes: \033[2J clear screen, \033[1;1H move cursor to top-left
+    std::cout << "\033[2J\033[1;1H";
+}
+
 int main() {
     bool isRunning = true;
     std::string input;
@@ -16,6 +21,7 @@ int main() {
         }
 
         if (isRunning) {
+            clearConsole();
             std::cout << "You entered: " << input << std::endl;
             std::cout << "Updating game state..." << std::endl;
             std::cout << "Rendering..." << std::endl;
