@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "InputHandler.h"
+#include "Map.h"
 #include <string>
 
 class Game {
@@ -20,6 +21,7 @@ private:
     InputHandler m_inputHandler;
     Command m_currentCommand;
     std::string m_lastAction;
+    Map m_map;
 };
 
 #endif
