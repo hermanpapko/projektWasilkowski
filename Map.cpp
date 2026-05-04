@@ -13,12 +13,20 @@ void Map::initialize() {
         std::string row = "";
         for (int x = 0; x < m_width; ++x) {
             if (x == 0 || x == m_width - 1 || y == 0 || y == m_height - 1) {
-                row += "#"; // Wall
+                row += "#"; // Perimeter Wall
             } else {
                 row += "."; // Floor
             }
         }
         m_grid.push_back(row);
+    }
+
+    // Add some internal pillars for testing collisions later
+    if (m_width > 15 && m_height > 8) {
+        m_grid[3][5] = '#';
+        m_grid[3][14] = '#';
+        m_grid[6][5] = '#';
+        m_grid[6][14] = '#';
     }
 }
 
