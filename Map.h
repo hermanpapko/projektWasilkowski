@@ -10,7 +10,7 @@ public:
     ~Map();
 
     void initialize();
-    void render() const;
+    void render(int playerX, int playerY) const;
 
     int getWidth() const { return m_width; }
     int getHeight() const { return m_height; }

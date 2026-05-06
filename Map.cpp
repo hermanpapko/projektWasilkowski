@@ -30,8 +30,15 @@ void Map::initialize() {
     }
 }
 
-void Map::render() const {
-    for (const auto& row : m_grid) {
-        std::cout << row << std::endl;
+void Map::render(int playerX, int playerY) const {
+    for (int y = 0; y < m_height; ++y) {
+        for (int x = 0; x < m_width; ++x) {
+            if (x == playerX && y == playerY) {
+                std::cout << "@"; // Player symbol
+            } else {
+                std::cout << m_grid[y][x];
+            }
+        }
+        std::cout << std::endl;
     }
 }

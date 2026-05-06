@@ -22,6 +22,8 @@ private:
     Command m_currentCommand;
     std::string m_lastAction;
     Map m_map;
+    int m_playerX;
+    int m_playerY;
 };
 
 #endif

@@ -1,7 +1,7 @@
 #include "Game.h"
 #include <iostream>
 
-Game::Game() : m_isRunning(true), m_currentCommand(Command::NONE), m_lastAction("None"), m_map(20, 10) {}
+Game::Game() : m_isRunning(true), m_currentCommand(Command::NONE), m_lastAction("None"), m_map(20, 10), m_playerX(1), m_playerY(1) {}
 
 Game::~Game() {}
 
@@ -21,15 +21,19 @@ void Game::run() {
 void Game::update() {
     switch (m_currentCommand) {
         case Command::UP:
+            m_playerY--;
             m_lastAction = "Moving Up";
             break;
         case Command::DOWN:
+            m_playerY++;
             m_lastAction = "Moving Down";
             break;
         case Command::LEFT:
+            m_playerX--;
             m_lastAction = "Moving Left";
             break;
         case Command::RIGHT:
+            m_playerX++;
             m_lastAction = "Moving Right";
             break;
         case Command::QUIT:
@@ -45,7 +49,7 @@ void Game::render() {
     if (m_isRunning) {
         clearConsole();
         std::cout << "--- Game Engine (Refactored) ---" << std::endl;
-        m_map.render();
+        m_map.render(m_playerX, m_playerY);
         std::cout << "Action:   " << m_lastAction << std::endl;
         std::cout << "--------------------------------" << std::endl;
         std::cout << "Press Q to quit." << std::endl;
