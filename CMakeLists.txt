@@ -3,4 +3,5 @@ project(projektWasilkowski)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(projektWasilkowski main.cpp Game.cpp Game.h InputHandler.cpp InputHandler.h Entity.cpp Entity.h Player.cpp Player.h)
+add_executable(projektWasilkowski main.cpp Game.cpp Game.h InputHandler.cpp InputHandler.h Entity.cpp Entity.h Map.cpp Map.h Player.cpp Player.h)
+
