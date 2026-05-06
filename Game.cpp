@@ -6,6 +6,7 @@ Game::Game() : m_isRunning(true), m_currentCommand(Command::NONE), m_lastAction(
 Game::~Game() {}
 
 void Game::run() {
+    clearConsole();
     std::cout << "Game Started!" << std::endl;
     std::cout << "Controls: WASD to move, Q to quit." << std::endl;
 
@@ -57,15 +58,20 @@ void Game::update() {
 
 void Game::render() {
     if (m_isRunning) {
-        clearConsole();
-        std::cout << "--- Game Engine (Refactored) ---" << std::endl;
-        m_map.render(m_playerX, m_playerY);
-        std::cout << "Action:   " << m_lastAction << std::endl;
-        std::cout << "--------------------------------" << std::endl;
-        std::cout << "Press Q to quit." << std::endl;
+        // Move cursor to 1,1 instead of clearing the whole screen
+        std::cout << "\033[H"; 
+        
+        std::string frame = "--- Game Engine (Refactored) ---\n";
+        frame += m_map.render(m_playerX, m_playerY);
+        frame += "Action:   " + m_lastAction + "                \n"; // Padding to clear old text
+        frame += "--------------------------------\n";
+        frame += "Press Q to quit.                \n";
+        
+        std::cout << frame << std::flush;
     }
 }
 
 void Game::clearConsole() {
-    std::cout << "\033[2J\033[1;1H";
+    // Initial clear only
+    std::cout << "\033[2J\033[H";
 }
