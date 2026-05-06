@@ -19,21 +19,24 @@ void Game::run() {
 }
 
 void Game::update() {
+    int nextX = m_playerX;
+    int nextY = m_playerY;
+
     switch (m_currentCommand) {
         case Command::UP:
-            m_playerY--;
+            nextY--;
             m_lastAction = "Moving Up";
             break;
         case Command::DOWN:
-            m_playerY++;
+            nextY++;
             m_lastAction = "Moving Down";
             break;
         case Command::LEFT:
-            m_playerX--;
+            nextX--;
             m_lastAction = "Moving Left";
             break;
         case Command::RIGHT:
-            m_playerX++;
+            nextX++;
             m_lastAction = "Moving Right";
             break;
         case Command::QUIT:
@@ -42,6 +45,13 @@ void Game::update() {
         case Command::NONE:
         default:
             break;
+    }
+
+    if (m_map.isWalkable(nextX, nextY)) {
+        m_playerX = nextX;
+        m_playerY = nextY;
+    } else if (m_currentCommand != Command::NONE && m_currentCommand != Command::QUIT) {
+        m_lastAction += " (Blocked!)";
     }
 }
 

@@ -15,6 +15,9 @@ public:
     int getWidth() const { return m_width; }
     int getHeight() const { return m_height; }
 
+    bool isWithinBounds(int x, int y) const;
+    bool isWalkable(int x, int y) const;
+
 private:
     int m_width;
     int m_height;

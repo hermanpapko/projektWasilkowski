@@ -42,3 +42,14 @@ void Map::render(int playerX, int playerY) const {
         std::cout << std::endl;
     }
 }
+
+bool Map::isWithinBounds(int x, int y) const {
+    return (x >= 0 && x < m_width && y >= 0 && y < m_height);
+}
+
+bool Map::isWalkable(int x, int y) const {
+    if (!isWithinBounds(x, y)) {
+        return false;
+    }
+    return m_grid[y][x] == '.'; // Only floor is walkable
+}
