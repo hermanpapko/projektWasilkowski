@@ -4,13 +4,19 @@
 #include <vector>
 #include <string>
 
+struct RenderEntity {
+    int x;
+    int y;
+    char symbol;
+};
+
 class Map {
 public:
     Map(int width, int height);
     ~Map();
 
     void initialize();
-    std::string render(int playerX, int playerY) const;
+    std::string render(const std::vector<RenderEntity>& entities) const;
 
     int getWidth() const { return m_width; }
     int getHeight() const { return m_height; }

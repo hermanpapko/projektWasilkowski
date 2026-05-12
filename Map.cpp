@@ -30,15 +30,21 @@ void Map::initialize() {
     }
 }
 
-std::string Map::render(int playerX, int playerY) const {
+std::string Map::render(const std::vector<RenderEntity>& entities) const {
     std::string result = "";
     for (int y = 0; y < m_height; ++y) {
         for (int x = 0; x < m_width; ++x) {
-            if (x == playerX && y == playerY) {
-                result += "@"; // Player symbol
-            } else {
-                result += m_grid[y][x];
+            char symbolToRender = m_grid[y][x];
+            
+            // Check if any entity is at this position
+            for (const auto& entity : entities) {
+                if (entity.x == x && entity.y == y) {
+                    symbolToRender = entity.symbol;
+                    break;
+                }
             }
+            
+            result += symbolToRender;
         }
         result += "\n";
     }
