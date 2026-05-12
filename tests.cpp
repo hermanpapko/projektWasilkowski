@@ -62,12 +62,6 @@ void testMapRendering() {
     std::cout << "Running testMapRendering..." << std::endl;
     
     Map map(5, 5);
-    // Grid 5x5:
-    // #####
-    // #...#
-    // #...#
-    // #...#
-    // #####
     
     std::vector<RenderEntity> entities = {
         {1, 1, '@'},
@@ -76,16 +70,8 @@ void testMapRendering() {
     
     std::string rendered = map.render(entities);
     
-    // Check if @ and E are present in the string
     assert(rendered.find('@') != std::string::npos);
     assert(rendered.find('E') != std::string::npos);
-    
-    // Check specific positions (approximate check by line)
-    // Line 1: #####\n (offset 0-5)
-    // Line 2: #@..#\n (offset 6-11) -> @ at index 7
-    // Line 3: #...#\n (offset 12-17)
-    // Line 4: #..E#\n (offset 18-23) -> E at index 21
-    // Line 5: #####\n (offset 24-29)
     
     assert(rendered[7] == '@');
     assert(rendered[21] == 'E');
@@ -93,11 +79,54 @@ void testMapRendering() {
     std::cout << "testMapRendering passed!" << std::endl;
 }
 
+void testEnemyAI() {
+    std::cout << "Running testEnemyAI..." << std::endl;
+    
+    Map map(10, 10);
+    std::vector<std::unique_ptr<Enemy>> enemies;
+    enemies.push_back(std::make_unique<Enemy>(5, 5));
+    
+    Enemy* enemy = enemies[0].get();
+    int initialX = enemy->getX();
+    int initialY = enemy->getY();
+    
+    bool moved = false;
+    for (int i = 0; i < 100; ++i) {
+        enemy->moveRandomly(map, enemies);
+        if (enemy->getX() != initialX || enemy->getY() != initialY) {
+            moved = true;
+            break;
+        }
+    }
+    
+    assert(moved == true);
+    
+    Enemy wallEnemy(1, 1); 
+    std::vector<std::unique_ptr<Enemy>> wallEnemies;
+    for (int i = 0; i < 100; ++i) {
+        wallEnemy.moveRandomly(map, wallEnemies);
+        assert(map.isWalkable(wallEnemy.getX(), wallEnemy.getY()));
+    }
+
+    std::vector<std::unique_ptr<Enemy>> collisionEnemies;
+    collisionEnemies.push_back(std::make_unique<Enemy>(2, 2)); 
+    collisionEnemies.push_back(std::make_unique<Enemy>(1, 2)); 
+    
+    Enemy* movingEnemy = collisionEnemies[1].get();
+    for (int i = 0; i < 200; ++i) {
+        movingEnemy->moveRandomly(map, collisionEnemies);
+        assert(!(movingEnemy->getX() == 2 && movingEnemy->getY() == 2));
+    }
+    
+    std::cout << "testEnemyAI passed!" << std::endl;
+}
+
 int main() {
     testDamageCalculation();
     testPlayerStats();
     testEnemyStats();
     testMapRendering();
+    testEnemyAI();
     
     std::cout << "\nAll tests passed successfully!" << std::endl;
     return 0;

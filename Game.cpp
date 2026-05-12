@@ -85,6 +85,13 @@ void Game::update() {
     } else if (m_currentCommand != Command::NONE && m_currentCommand != Command::QUIT) {
         m_lastAction += " (Blocked!)";
     }
+
+    // Basic Enemy AI: Move enemies if player did something (Turn-based)
+    if (m_currentCommand != Command::NONE && m_currentCommand != Command::QUIT) {
+        for (auto& enemy : m_enemies) {
+            enemy->moveRandomly(m_map, m_enemies);
+        }
+    }
 }
 
 void Game::render() {
