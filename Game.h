@@ -3,7 +3,10 @@
 
 #include "InputHandler.h"
 #include "Map.h"
+#include "Enemy.h"
 #include <string>
+#include <vector>
+#include <memory>
 
 class Game {
 public:
@@ -16,6 +19,7 @@ private:
     void update();
     void render();
     void clearConsole();
+    void spawnEnemies(int count);
 
     bool m_isRunning;
     InputHandler m_inputHandler;
@@ -24,6 +28,7 @@ private:
     Map m_map;
     int m_playerX;
     int m_playerY;
+    std::vector<std::unique_ptr<Enemy>> m_enemies;
 };
 
 #endif

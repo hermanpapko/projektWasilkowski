@@ -1,8 +1,10 @@
 #include "Entity.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "Map.h"
 #include <iostream>
 #include <cassert>
+#include <vector>
 
 void testDamageCalculation() {
     std::cout << "Running testDamageCalculation..." << std::endl;
@@ -56,10 +58,46 @@ void testEnemyStats() {
     std::cout << "testEnemyStats passed!" << std::endl;
 }
 
+void testMapRendering() {
+    std::cout << "Running testMapRendering..." << std::endl;
+    
+    Map map(5, 5);
+    // Grid 5x5:
+    // #####
+    // #...#
+    // #...#
+    // #...#
+    // #####
+    
+    std::vector<RenderEntity> entities = {
+        {1, 1, '@'},
+        {3, 3, 'E'}
+    };
+    
+    std::string rendered = map.render(entities);
+    
+    // Check if @ and E are present in the string
+    assert(rendered.find('@') != std::string::npos);
+    assert(rendered.find('E') != std::string::npos);
+    
+    // Check specific positions (approximate check by line)
+    // Line 1: #####\n (offset 0-5)
+    // Line 2: #@..#\n (offset 6-11) -> @ at index 7
+    // Line 3: #...#\n (offset 12-17)
+    // Line 4: #..E#\n (offset 18-23) -> E at index 21
+    // Line 5: #####\n (offset 24-29)
+    
+    assert(rendered[7] == '@');
+    assert(rendered[21] == 'E');
+    
+    std::cout << "testMapRendering passed!" << std::endl;
+}
+
 int main() {
     testDamageCalculation();
     testPlayerStats();
     testEnemyStats();
+    testMapRendering();
     
     std::cout << "\nAll tests passed successfully!" << std::endl;
     return 0;
