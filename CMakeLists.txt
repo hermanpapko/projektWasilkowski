@@ -11,6 +11,7 @@ add_executable(projektWasilkowski
     Entity.cpp Entity.h 
     Player.cpp Player.h 
     Enemy.cpp Enemy.h
+    Map.cpp Map.h
 )
 
 # Test executable
@@ -19,4 +20,5 @@ add_executable(run_tests
     Entity.cpp 
     Player.cpp 
     Enemy.cpp
+    Map.cpp Map.h
 )
