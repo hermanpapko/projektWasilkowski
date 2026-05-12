@@ -4,7 +4,7 @@
 Enemy::Enemy(int x, int y, char symbol, int hp, int damage)
     : Entity(x, y, symbol, hp, damage) {}
 
-void Enemy::moveRandomly(const Map& map) {
+void Enemy::moveRandomly(const Map& map, const std::vector<std::unique_ptr<Enemy>>& enemies) {
     static std::random_device rd;
     static std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 4); // 0: Stay, 1: Up, 2: Down, 3: Left, 4: Right
@@ -21,7 +21,19 @@ void Enemy::moveRandomly(const Map& map) {
         default: break; // Stay put
     }
 
-    if (map.isWalkable(nextX, nextY)) {
+    if (!map.isWalkable(nextX, nextY)) {
+        return;
+    }
+
+    bool occupied = false;
+    for (const auto& other : enemies) {
+        if (other.get() != this && other->getX() == nextX && other->getY() == nextY) {
+            occupied = true;
+            break;
+        }
+    }
+
+    if (!occupied) {
         m_x = nextX;
         m_y = nextY;
     }
