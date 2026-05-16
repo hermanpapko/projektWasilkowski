@@ -125,7 +125,8 @@ void Game::update() {
         std::remove_if(m_enemies.begin(), m_enemies.end(),
             [this](const std::unique_ptr<Enemy>& enemy) { 
                 if (!enemy->isAlive()) {
-                    addLog("Enemy died!");
+                    addLog("Enemy died! +10 Score");
+                    m_player->addScore(10);
                     return true;
                 }
                 return false;
@@ -153,6 +154,13 @@ void Game::render() {
     }
 
     std::string frame = "--- Game Engine (Combat) ---\n";
+    
+    // HUD
+    frame += "Hero: " + m_player->getName() + " | HP: " + std::to_string(m_player->getHP()) + 
+             " | Level: " + std::to_string(m_player->getLevel()) + 
+             " | Score: " + std::to_string(m_player->getScore()) + "          \n";
+    frame += "--------------------------------\n";
+
     frame += m_map.render(entities);
     
     frame += "--- Event Log ---\n";
