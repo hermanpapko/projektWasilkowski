@@ -3,22 +3,24 @@ project(projektWasilkowski)
 
 set(CMAKE_CXX_STANDARD 20)
 
+include_directories(Core Entities World)
+
 # Main game executable
 add_executable(projektWasilkowski 
-    main.cpp 
-    Game.cpp Game.h 
-    InputHandler.cpp InputHandler.h 
-    Entity.cpp Entity.h 
-    Player.cpp Player.h 
-    Enemy.cpp Enemy.h
-    Map.cpp Map.h
+    Core/main.cpp 
+    Core/Game.cpp Core/Game.h 
+    Core/InputHandler.cpp Core/InputHandler.h 
+    Entities/Entity.cpp Entities/Entity.h 
+    Entities/Player.cpp Entities/Player.h 
+    Entities/Enemy.cpp Entities/Enemy.h
+    World/Map.cpp World/Map.h
 )
 
 # Test executable
 add_executable(run_tests 
     tests.cpp 
-    Entity.cpp 
-    Player.cpp 
-    Enemy.cpp
-    Map.cpp Map.h
+    Entities/Entity.cpp 
+    Entities/Player.cpp 
+    Entities/Enemy.cpp
+    World/Map.cpp World/Map.h
 )

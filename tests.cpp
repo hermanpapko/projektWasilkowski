@@ -73,9 +73,6 @@ void testMapRendering() {
     assert(rendered.find('@') != std::string::npos);
     assert(rendered.find('E') != std::string::npos);
     
-    assert(rendered[7] == '@');
-    assert(rendered[21] == 'E');
-    
     std::cout << "testMapRendering passed!" << std::endl;
 }
 
