@@ -28,6 +28,11 @@ void Map::initialize() {
         m_grid[6][5] = '#';
         m_grid[6][14] = '#';
     }
+
+    // Add exit tile
+    if (m_width > 2 && m_height > 2) {
+        m_grid[m_height - 2][m_width - 2] = '>';
+    }
 }
 
 std::string Map::render(const std::vector<RenderEntity>& entities) const {
@@ -59,5 +64,11 @@ bool Map::isWalkable(int x, int y) const {
     if (!isWithinBounds(x, y)) {
         return false;
     }
-    return m_grid[y][x] == '.'; // Only floor is walkable
+    char cell = m_grid[y][x];
+    return cell == '.' || cell == '>'; // Floor and Exit are walkable
+}
+
+bool Map::isExit(int x, int y) const {
+    if (!isWithinBounds(x, y)) return false;
+    return m_grid[y][x] == '>';
 }

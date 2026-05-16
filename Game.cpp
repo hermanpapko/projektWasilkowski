@@ -108,6 +108,12 @@ void Game::update() {
     if (!collision) {
         if (m_map.isWalkable(nextX, nextY)) {
             m_player->setPosition(nextX, nextY);
+            
+            // Check Win Condition
+            if (m_map.isExit(nextX, nextY)) {
+                m_isRunning = false;
+                addLog("VICTORY! You reached the exit!");
+            }
         } else {
             addLog("Player movement blocked!");
         }
@@ -172,6 +178,9 @@ void Game::render() {
     if (!m_player->isAlive()) {
         frame += "        GAME OVER!          \n";
         frame += "   The Hero has fallen...   \n";
+    } else if (!m_isRunning && m_map.isExit(m_player->getX(), m_player->getY())) {
+        frame += "        VICTORY!            \n";
+        frame += "   You escaped the dungeon! \n";
     } else {
         frame += "Press Q to quit.                \n";
     }
