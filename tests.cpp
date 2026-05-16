@@ -83,6 +83,8 @@ void testEnemyAI() {
     std::cout << "Running testEnemyAI..." << std::endl;
     
     Map map(10, 10);
+    Player dummyPlayer(0, 0, "TestHero");
+    
     std::vector<std::unique_ptr<Enemy>> enemies;
     enemies.push_back(std::make_unique<Enemy>(5, 5));
     
@@ -92,7 +94,7 @@ void testEnemyAI() {
     
     bool moved = false;
     for (int i = 0; i < 100; ++i) {
-        enemy->moveRandomly(map, enemies);
+        enemy->moveRandomly(map, enemies, dummyPlayer);
         if (enemy->getX() != initialX || enemy->getY() != initialY) {
             moved = true;
             break;
@@ -104,7 +106,7 @@ void testEnemyAI() {
     Enemy wallEnemy(1, 1); 
     std::vector<std::unique_ptr<Enemy>> wallEnemies;
     for (int i = 0; i < 100; ++i) {
-        wallEnemy.moveRandomly(map, wallEnemies);
+        wallEnemy.moveRandomly(map, wallEnemies, dummyPlayer);
         assert(map.isWalkable(wallEnemy.getX(), wallEnemy.getY()));
     }
 
@@ -114,8 +116,17 @@ void testEnemyAI() {
     
     Enemy* movingEnemy = collisionEnemies[1].get();
     for (int i = 0; i < 200; ++i) {
-        movingEnemy->moveRandomly(map, collisionEnemies);
+        movingEnemy->moveRandomly(map, collisionEnemies, dummyPlayer);
         assert(!(movingEnemy->getX() == 2 && movingEnemy->getY() == 2));
+    }
+
+    // Test collision with player
+    Enemy playerEnemy(1, 1);
+    std::vector<std::unique_ptr<Enemy>> noEnemies;
+    Player targetPlayer(1, 2, "Target");
+    for (int i = 0; i < 200; i++) {
+        playerEnemy.moveRandomly(map, noEnemies, targetPlayer);
+        assert(!(playerEnemy.getX() == 1 && playerEnemy.getY() == 2));
     }
     
     std::cout << "testEnemyAI passed!" << std::endl;

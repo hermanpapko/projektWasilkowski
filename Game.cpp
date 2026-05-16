@@ -1,17 +1,25 @@
 #include "Game.h"
 #include <iostream>
 #include <random>
+#include <algorithm>
 
-Game::Game() : m_isRunning(true), m_currentCommand(Command::NONE), m_lastAction("None"), m_map(20, 10), m_playerX(1), m_playerY(1) {
+Game::Game() : m_isRunning(true), m_currentCommand(Command::NONE), m_map(20, 10) {
+    m_player = std::make_unique<Player>(1, 1, "Hero");
     spawnEnemies(3);
+    addLog("Game Started! Controls: WASD to move, Q to quit.");
 }
 
 Game::~Game() {}
 
+void Game::addLog(const std::string& message) {
+    m_eventLog.push_back(message);
+    if (m_eventLog.size() > 5) {
+        m_eventLog.erase(m_eventLog.begin());
+    }
+}
+
 void Game::run() {
     clearConsole();
-    std::cout << "Game Started!" << std::endl;
-    std::cout << "Controls: WASD to move, Q to quit." << std::endl;
 
     while (m_isRunning) {
         m_currentCommand = m_inputHandler.handleInput();
@@ -33,7 +41,7 @@ void Game::spawnEnemies(int count) {
         int x = disX(gen);
         int y = disY(gen);
 
-        if (m_map.isWalkable(x, y) && (x != m_playerX || y != m_playerY)) {
+        if (m_map.isWalkable(x, y) && (x != m_player->getX() || y != m_player->getY())) {
             bool occupied = false;
             for (const auto& enemy : m_enemies) {
                 if (enemy->getX() == x && enemy->getY() == y) {
@@ -51,25 +59,21 @@ void Game::spawnEnemies(int count) {
 }
 
 void Game::update() {
-    int nextX = m_playerX;
-    int nextY = m_playerY;
+    int nextX = m_player->getX();
+    int nextY = m_player->getY();
 
     switch (m_currentCommand) {
         case Command::UP:
             nextY--;
-            m_lastAction = "Moving Up";
             break;
         case Command::DOWN:
             nextY++;
-            m_lastAction = "Moving Down";
             break;
         case Command::LEFT:
             nextX--;
-            m_lastAction = "Moving Left";
             break;
         case Command::RIGHT:
             nextX++;
-            m_lastAction = "Moving Right";
             break;
         case Command::QUIT:
             m_isRunning = false;
@@ -79,40 +83,92 @@ void Game::update() {
             break;
     }
 
-    if (m_map.isWalkable(nextX, nextY)) {
-        m_playerX = nextX;
-        m_playerY = nextY;
-    } else if (m_currentCommand != Command::NONE && m_currentCommand != Command::QUIT) {
-        m_lastAction += " (Blocked!)";
+    if (m_currentCommand == Command::NONE || m_currentCommand == Command::QUIT) {
+        return;
+    }
+
+    bool collision = false;
+    for (const auto& enemy : m_enemies) {
+        if (enemy->getX() == nextX && enemy->getY() == nextY) {
+            collision = true;
+            
+            // Combat logic
+            int playerDamage = m_player->getDamage();
+            int enemyDamage = enemy->getDamage();
+            
+            enemy->takeDamage(playerDamage);
+            m_player->takeDamage(enemyDamage);
+            
+            addLog("Player hits Enemy for " + std::to_string(playerDamage) + 
+                   "! Enemy hits back for " + std::to_string(enemyDamage) + "!");
+            break;
+        }
+    }
+
+    if (!collision) {
+        if (m_map.isWalkable(nextX, nextY)) {
+            m_player->setPosition(nextX, nextY);
+        } else {
+            addLog("Player movement blocked!");
+        }
     }
 
     // Basic Enemy AI: Move enemies if player did something (Turn-based)
-    if (m_currentCommand != Command::NONE && m_currentCommand != Command::QUIT) {
-        for (auto& enemy : m_enemies) {
-            enemy->moveRandomly(m_map, m_enemies);
+    for (auto& enemy : m_enemies) {
+        if (enemy->moveRandomly(m_map, m_enemies, *m_player)) {
+            addLog("Enemy attacks Player! Both take damage.");
         }
+    }
+
+    // Remove dead enemies
+    m_enemies.erase(
+        std::remove_if(m_enemies.begin(), m_enemies.end(),
+            [this](const std::unique_ptr<Enemy>& enemy) { 
+                if (!enemy->isAlive()) {
+                    addLog("Enemy died!");
+                    return true;
+                }
+                return false;
+            }),
+        m_enemies.end()
+    );
+
+    // Check Player Death
+    if (!m_player->isAlive()) {
+        m_isRunning = false;
+        addLog("PLAYER DIED! Game Over.");
     }
 }
 
 void Game::render() {
-    if (m_isRunning) {
-        // Move cursor to 1,1 instead of clearing the whole screen
-        std::cout << "\033[H"; 
-        
-        std::vector<RenderEntity> entities;
-        entities.push_back({m_playerX, m_playerY, '@'});
-        for (const auto& enemy : m_enemies) {
-            entities.push_back({enemy->getX(), enemy->getY(), enemy->getSymbol()});
-        }
-
-        std::string frame = "--- Game Engine (Refactored) ---\n";
-        frame += m_map.render(entities);
-        frame += "Action:   " + m_lastAction + "                \n"; // Padding to clear old text
-        frame += "--------------------------------\n";
-        frame += "Press Q to quit.                \n";
-        
-        std::cout << frame << std::flush;
+    // Move cursor to 1,1 instead of clearing the whole screen
+    std::cout << "\033[H"; 
+    
+    std::vector<RenderEntity> entities;
+    if (m_player->isAlive()) {
+        entities.push_back({m_player->getX(), m_player->getY(), m_player->getSymbol()});
     }
+    for (const auto& enemy : m_enemies) {
+        entities.push_back({enemy->getX(), enemy->getY(), enemy->getSymbol()});
+    }
+
+    std::string frame = "--- Game Engine (Combat) ---\n";
+    frame += m_map.render(entities);
+    
+    frame += "--- Event Log ---\n";
+    for (const auto& log : m_eventLog) {
+        frame += log + "                                        \n"; // Padding
+    }
+    frame += "--------------------------------\n";
+    
+    if (!m_player->isAlive()) {
+        frame += "        GAME OVER!          \n";
+        frame += "   The Hero has fallen...   \n";
+    } else {
+        frame += "Press Q to quit.                \n";
+    }
+    
+    std::cout << frame << std::flush;
 }
 
 void Game::clearConsole() {
