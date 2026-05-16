@@ -124,27 +124,39 @@ void Game::update() {
             [](const std::unique_ptr<Enemy>& enemy) { return !enemy->isAlive(); }),
         m_enemies.end()
     );
+
+    // Check Player Death
+    if (!m_player->isAlive()) {
+        m_isRunning = false;
+        m_lastAction = "PLAYER DIED! Game Over.";
+    }
 }
 
 void Game::render() {
-    if (m_isRunning) {
-        // Move cursor to 1,1 instead of clearing the whole screen
-        std::cout << "\033[H"; 
-        
-        std::vector<RenderEntity> entities;
+    // Move cursor to 1,1 instead of clearing the whole screen
+    std::cout << "\033[H"; 
+    
+    std::vector<RenderEntity> entities;
+    if (m_player->isAlive()) {
         entities.push_back({m_player->getX(), m_player->getY(), m_player->getSymbol()});
-        for (const auto& enemy : m_enemies) {
-            entities.push_back({enemy->getX(), enemy->getY(), enemy->getSymbol()});
-        }
-
-        std::string frame = "--- Game Engine (Refactored) ---\n";
-        frame += m_map.render(entities);
-        frame += "Action:   " + m_lastAction + "                \n"; // Padding to clear old text
-        frame += "--------------------------------\n";
-        frame += "Press Q to quit.                \n";
-        
-        std::cout << frame << std::flush;
     }
+    for (const auto& enemy : m_enemies) {
+        entities.push_back({enemy->getX(), enemy->getY(), enemy->getSymbol()});
+    }
+
+    std::string frame = "--- Game Engine (Combat) ---\n";
+    frame += m_map.render(entities);
+    frame += "Action:   " + m_lastAction + "                \n"; // Padding to clear old text
+    frame += "--------------------------------\n";
+    
+    if (!m_player->isAlive()) {
+        frame += "        GAME OVER!          \n";
+        frame += "   The Hero has fallen...   \n";
+    } else {
+        frame += "Press Q to quit.                \n";
+    }
+    
+    std::cout << frame << std::flush;
 }
 
 void Game::clearConsole() {
