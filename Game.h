@@ -4,6 +4,7 @@
 #include "InputHandler.h"
 #include "Map.h"
 #include "Enemy.h"
+#include "Player.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -26,8 +27,7 @@ private:
     Command m_currentCommand;
     std::string m_lastAction;
     Map m_map;
-    int m_playerX;
-    int m_playerY;
+    std::unique_ptr<Player> m_player;
     std::vector<std::unique_ptr<Enemy>> m_enemies;
 };
 

@@ -2,7 +2,8 @@
 #include <iostream>
 #include <random>
 
-Game::Game() : m_isRunning(true), m_currentCommand(Command::NONE), m_lastAction("None"), m_map(20, 10), m_playerX(1), m_playerY(1) {
+Game::Game() : m_isRunning(true), m_currentCommand(Command::NONE), m_lastAction("None"), m_map(20, 10) {
+    m_player = std::make_unique<Player>(1, 1, "Hero");
     spawnEnemies(3);
 }
 
@@ -33,7 +34,7 @@ void Game::spawnEnemies(int count) {
         int x = disX(gen);
         int y = disY(gen);
 
-        if (m_map.isWalkable(x, y) && (x != m_playerX || y != m_playerY)) {
+        if (m_map.isWalkable(x, y) && (x != m_player->getX() || y != m_player->getY())) {
             bool occupied = false;
             for (const auto& enemy : m_enemies) {
                 if (enemy->getX() == x && enemy->getY() == y) {
@@ -51,8 +52,8 @@ void Game::spawnEnemies(int count) {
 }
 
 void Game::update() {
-    int nextX = m_playerX;
-    int nextY = m_playerY;
+    int nextX = m_player->getX();
+    int nextY = m_player->getY();
 
     switch (m_currentCommand) {
         case Command::UP:
@@ -79,18 +80,30 @@ void Game::update() {
             break;
     }
 
-    if (m_map.isWalkable(nextX, nextY)) {
-        m_playerX = nextX;
-        m_playerY = nextY;
-    } else if (m_currentCommand != Command::NONE && m_currentCommand != Command::QUIT) {
-        m_lastAction += " (Blocked!)";
+    if (m_currentCommand == Command::NONE || m_currentCommand == Command::QUIT) {
+        return;
+    }
+
+    bool collision = false;
+    for (const auto& enemy : m_enemies) {
+        if (enemy->getX() == nextX && enemy->getY() == nextY) {
+            collision = true;
+            m_lastAction = "Collision with Enemy detected!";
+            break;
+        }
+    }
+
+    if (!collision) {
+        if (m_map.isWalkable(nextX, nextY)) {
+            m_player->setPosition(nextX, nextY);
+        } else {
+            m_lastAction += " (Blocked!)";
+        }
     }
 
     // Basic Enemy AI: Move enemies if player did something (Turn-based)
-    if (m_currentCommand != Command::NONE && m_currentCommand != Command::QUIT) {
-        for (auto& enemy : m_enemies) {
-            enemy->moveRandomly(m_map, m_enemies);
-        }
+    for (auto& enemy : m_enemies) {
+        enemy->moveRandomly(m_map, m_enemies);
     }
 }
 
@@ -100,7 +113,7 @@ void Game::render() {
         std::cout << "\033[H"; 
         
         std::vector<RenderEntity> entities;
-        entities.push_back({m_playerX, m_playerY, '@'});
+        entities.push_back({m_player->getX(), m_player->getY(), m_player->getSymbol()});
         for (const auto& enemy : m_enemies) {
             entities.push_back({enemy->getX(), enemy->getY(), enemy->getSymbol()});
         }
