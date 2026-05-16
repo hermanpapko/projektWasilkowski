@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <iostream>
 #include <random>
+#include <algorithm>
 
 Game::Game() : m_isRunning(true), m_currentCommand(Command::NONE), m_lastAction("None"), m_map(20, 10) {
     m_player = std::make_unique<Player>(1, 1, "Hero");
@@ -116,6 +117,13 @@ void Game::update() {
             m_lastAction = "Enemy attacks Player! Both take damage.";
         }
     }
+
+    // Remove dead enemies
+    m_enemies.erase(
+        std::remove_if(m_enemies.begin(), m_enemies.end(),
+            [](const std::unique_ptr<Enemy>& enemy) { return !enemy->isAlive(); }),
+        m_enemies.end()
+    );
 }
 
 void Game::render() {
