@@ -159,30 +159,30 @@ void Game::render() {
         entities.push_back({enemy->getX(), enemy->getY(), enemy->getSymbol()});
     }
 
-    std::string frame = "--- Game Engine (Combat) ---\n";
+    std::string frame = "\x1b[36m--- Game Engine (Interface) ---\x1b[0m\n";
     
     // HUD
-    frame += "Hero: " + m_player->getName() + " | HP: " + std::to_string(m_player->getHP()) + 
-             " | Level: " + std::to_string(m_player->getLevel()) + 
-             " | Score: " + std::to_string(m_player->getScore()) + "          \n";
+    frame += "\x1b[32mHero: " + m_player->getName() + "\x1b[0m | \x1b[31mHP: " + std::to_string(m_player->getHP()) + 
+             "\x1b[0m | \x1b[33mLevel: " + std::to_string(m_player->getLevel()) + 
+             "\x1b[0m | \x1b[35mScore: " + std::to_string(m_player->getScore()) + "\x1b[0m          \n";
     frame += "--------------------------------\n";
 
     frame += m_map.render(entities);
     
-    frame += "--- Event Log ---\n";
+    frame += "\x1b[34m--- Event Log ---\x1b[0m\n";
     for (const auto& log : m_eventLog) {
         frame += log + "                                        \n"; // Padding
     }
     frame += "--------------------------------\n";
     
     if (!m_player->isAlive()) {
-        frame += "        GAME OVER!          \n";
-        frame += "   The Hero has fallen...   \n";
+        frame += "\x1b[31m        GAME OVER!          \n";
+        frame += "   The Hero has fallen...   \x1b[0m\n";
     } else if (!m_isRunning && m_map.isExit(m_player->getX(), m_player->getY())) {
-        frame += "        VICTORY!            \n";
-        frame += "   You escaped the dungeon! \n";
+        frame += "\x1b[32m        VICTORY!            \n";
+        frame += "   You escaped the dungeon! \x1b[0m\n";
     } else {
-        frame += "Press Q to quit.                \n";
+        frame += "Press \x1b[31mQ\x1b[0m to quit.                \n";
     }
     
     std::cout << frame << std::flush;
