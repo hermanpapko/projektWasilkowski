@@ -25,7 +25,8 @@ private:
     bool m_isRunning;
     InputHandler m_inputHandler;
     Command m_currentCommand;
-    std::string m_lastAction;
+    std::vector<std::string> m_eventLog;
+    void addLog(const std::string& message);
     Map m_map;
     std::unique_ptr<Player> m_player;
     std::vector<std::unique_ptr<Enemy>> m_enemies;
