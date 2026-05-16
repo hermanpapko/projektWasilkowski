@@ -23,6 +23,7 @@ public:
 
     bool isWithinBounds(int x, int y) const;
     bool isWalkable(int x, int y) const;
+    bool isExit(int x, int y) const;
 
 private:
     int m_width;
