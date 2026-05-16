@@ -88,7 +88,16 @@ void Game::update() {
     for (const auto& enemy : m_enemies) {
         if (enemy->getX() == nextX && enemy->getY() == nextY) {
             collision = true;
-            m_lastAction = "Collision with Enemy detected!";
+            
+            // Combat logic
+            int playerDamage = m_player->getDamage();
+            int enemyDamage = enemy->getDamage();
+            
+            enemy->takeDamage(playerDamage);
+            m_player->takeDamage(enemyDamage);
+            
+            m_lastAction = "Player hits Enemy for " + std::to_string(playerDamage) + 
+                           "! Enemy hits back for " + std::to_string(enemyDamage) + "!";
             break;
         }
     }
@@ -103,7 +112,9 @@ void Game::update() {
 
     // Basic Enemy AI: Move enemies if player did something (Turn-based)
     for (auto& enemy : m_enemies) {
-        enemy->moveRandomly(m_map, m_enemies);
+        if (enemy->moveRandomly(m_map, m_enemies, *m_player)) {
+            m_lastAction = "Enemy attacks Player! Both take damage.";
+        }
     }
 }
 
