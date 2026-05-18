@@ -14,6 +14,7 @@ public:
 
     void setPosition(int x, int y) { m_x = x; m_y = y; }
     void takeDamage(int amount);
+    void heal(int amount);
     bool isAlive() const { return m_hp > 0; }
 
 protected:

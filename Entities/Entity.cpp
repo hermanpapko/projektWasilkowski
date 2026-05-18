@@ -8,3 +8,7 @@ void Entity::takeDamage(int amount) {
     m_hp -= amount;
     if (m_hp < 0) m_hp = 0;
 }
+
+void Entity::heal(int amount) {
+    m_hp += amount;
+}

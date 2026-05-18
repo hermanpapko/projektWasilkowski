@@ -154,6 +154,24 @@ void Game::update() {
                 m_isRunning = false;
                 addLog("VICTORY! You reached the exit!");
             }
+
+            // Item pickup logic
+            auto it = std::find_if(m_items.begin(), m_items.end(),
+                [nextX, nextY](const std::unique_ptr<Item>& item) {
+                    return item->getX() == nextX && item->getY() == nextY;
+                });
+
+            if (it != m_items.end()) {
+                HealthPotion* potion = dynamic_cast<HealthPotion*>(it->get());
+                if (potion) {
+                    int healAmount = potion->getHealAmount();
+                    m_player->heal(healAmount);
+                    addLog("Picked up " + potion->getName() + "! Healed for " + std::to_string(healAmount) + " HP.");
+                    
+                    // Remove the item
+                    m_items.erase(it);
+                }
+            }
         } else {
             addLog("Player movement blocked!");
         }
