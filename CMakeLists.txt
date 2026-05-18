@@ -16,6 +16,7 @@ add_executable(projektWasilkowski
     World/Map.cpp World/Map.h
     Items/Item.cpp Items/Item.h
     Items/HealthPotion.cpp Items/HealthPotion.h
+    Items/GoldChest.cpp Items/GoldChest.h
 )
 
 # Test executable
@@ -27,4 +28,5 @@ add_executable(run_tests
     World/Map.cpp World/Map.h
     Items/Item.cpp
     Items/HealthPotion.cpp
+    Items/GoldChest.cpp
 )

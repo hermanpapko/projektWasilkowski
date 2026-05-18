@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "HealthPotion.h"
+#include "GoldChest.h"
 #include <iostream>
 #include <random>
 #include <algorithm>
@@ -7,7 +8,7 @@
 Game::Game() : m_isRunning(true), m_currentCommand(Command::NONE), m_map(20, 10) {
     m_player = std::make_unique<Player>(1, 1, "Hero");
     spawnEnemies(3);
-    spawnItems(2);
+    spawnItems(4);
     addLog("Game Started! Controls: WASD to move, Q to quit.");
 }
 
@@ -62,13 +63,14 @@ void Game::spawnEnemies(int count) {
 
 /*
  * Spawns a specified number of items at random walkable and unoccupied positions on the map.
- * Ensures items do not overlap with the player, enemies, or other items.
+ * Randomly chooses between Health Potions and Gold Chests.
  */
 void Game::spawnItems(int count) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> disX(0, m_map.getWidth() - 1);
     std::uniform_int_distribution<> disY(0, m_map.getHeight() - 1);
+    std::uniform_int_distribution<> disType(0, 1);
 
     int spawned = 0;
     while (spawned < count) {
@@ -91,7 +93,11 @@ void Game::spawnItems(int count) {
             }
 
             if (!occupied) {
-                m_items.push_back(std::make_unique<HealthPotion>(x, y));
+                if (disType(gen) == 0) {
+                    m_items.push_back(std::make_unique<HealthPotion>(x, y));
+                } else {
+                    m_items.push_back(std::make_unique<GoldChest>(x, y));
+                }
                 spawned++;
             }
         }
@@ -162,13 +168,15 @@ void Game::update() {
                 });
 
             if (it != m_items.end()) {
-                HealthPotion* potion = dynamic_cast<HealthPotion*>(it->get());
-                if (potion) {
+                if (HealthPotion* potion = dynamic_cast<HealthPotion*>(it->get())) {
                     int healAmount = potion->getHealAmount();
                     m_player->heal(healAmount);
                     addLog("Picked up " + potion->getName() + "! Healed for " + std::to_string(healAmount) + " HP.");
-                    
-                    // Remove the item
+                    m_items.erase(it);
+                } else if (GoldChest* chest = dynamic_cast<GoldChest*>(it->get())) {
+                    int goldValue = chest->getGoldValue();
+                    m_player->addScore(goldValue);
+                    addLog("Opened " + chest->getName() + "! Gained " + std::to_string(goldValue) + " score.");
                     m_items.erase(it);
                 }
             }
