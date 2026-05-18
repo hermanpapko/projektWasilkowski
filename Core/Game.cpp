@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "HealthPotion.h"
 #include <iostream>
 #include <random>
 #include <algorithm>
@@ -6,6 +7,7 @@
 Game::Game() : m_isRunning(true), m_currentCommand(Command::NONE), m_map(20, 10) {
     m_player = std::make_unique<Player>(1, 1, "Hero");
     spawnEnemies(3);
+    spawnItems(2);
     addLog("Game Started! Controls: WASD to move, Q to quit.");
 }
 
@@ -52,6 +54,44 @@ void Game::spawnEnemies(int count) {
 
             if (!occupied) {
                 m_enemies.push_back(std::make_unique<Enemy>(x, y));
+                spawned++;
+            }
+        }
+    }
+}
+
+/*
+ * Spawns a specified number of items at random walkable and unoccupied positions on the map.
+ * Ensures items do not overlap with the player, enemies, or other items.
+ */
+void Game::spawnItems(int count) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> disX(0, m_map.getWidth() - 1);
+    std::uniform_int_distribution<> disY(0, m_map.getHeight() - 1);
+
+    int spawned = 0;
+    while (spawned < count) {
+        int x = disX(gen);
+        int y = disY(gen);
+
+        if (m_map.isWalkable(x, y) && (x != m_player->getX() || y != m_player->getY())) {
+            bool occupied = false;
+            for (const auto& enemy : m_enemies) {
+                if (enemy->getX() == x && enemy->getY() == y) {
+                    occupied = true;
+                    break;
+                }
+            }
+            for (const auto& item : m_items) {
+                if (item->getX() == x && item->getY() == y) {
+                    occupied = true;
+                    break;
+                }
+            }
+
+            if (!occupied) {
+                m_items.push_back(std::make_unique<HealthPotion>(x, y));
                 spawned++;
             }
         }
@@ -157,6 +197,9 @@ void Game::render() {
     }
     for (const auto& enemy : m_enemies) {
         entities.push_back({enemy->getX(), enemy->getY(), enemy->getSymbol()});
+    }
+    for (const auto& item : m_items) {
+        entities.push_back({item->getX(), item->getY(), item->getSymbol()});
     }
 
     std::string frame = "\x1b[36m--- Game Engine (Interface) ---\x1b[0m\n";

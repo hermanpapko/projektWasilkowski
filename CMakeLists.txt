@@ -3,7 +3,7 @@ project(projektWasilkowski)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include_directories(Core Entities World)
+include_directories(Core Entities World Items)
 
 # Main game executable
 add_executable(projektWasilkowski 
@@ -14,6 +14,8 @@ add_executable(projektWasilkowski
     Entities/Player.cpp Entities/Player.h 
     Entities/Enemy.cpp Entities/Enemy.h
     World/Map.cpp World/Map.h
+    Items/Item.cpp Items/Item.h
+    Items/HealthPotion.cpp Items/HealthPotion.h
 )
 
 # Test executable
@@ -23,4 +25,6 @@ add_executable(run_tests
     Entities/Player.cpp 
     Entities/Enemy.cpp
     World/Map.cpp World/Map.h
+    Items/Item.cpp
+    Items/HealthPotion.cpp
 )

@@ -5,6 +5,7 @@
 #include "Map.h"
 #include "Enemy.h"
 #include "Player.h"
+#include "Item.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -21,6 +22,7 @@ private:
     void render();
     void clearConsole();
     void spawnEnemies(int count);
+    void spawnItems(int count);
 
     bool m_isRunning;
     InputHandler m_inputHandler;
@@ -30,6 +32,7 @@ private:
     Map m_map;
     std::unique_ptr<Player> m_player;
     std::vector<std::unique_ptr<Enemy>> m_enemies;
+    std::vector<std::unique_ptr<Item>> m_items;
 };
 
 #endif
