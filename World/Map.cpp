@@ -94,3 +94,9 @@ bool Map::isExit(int x, int y) const {
     if (!isWithinBounds(x, y)) return false;
     return m_grid[y][x] == '>';
 }
+
+char Map::getCell(int x, int y) const {
+    if (!isWithinBounds(x, y)) return ' ';
+    return m_grid[y][x];
+}
+

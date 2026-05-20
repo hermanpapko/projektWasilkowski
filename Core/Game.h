@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <SFML/Graphics.hpp>
 
 class Game {
 public:
@@ -19,7 +20,6 @@ public:
 private:
     void update();
     void render();
-    void clearConsole();
     void spawnEnemies(int count);
 
     bool m_isRunning;
@@ -30,6 +30,11 @@ private:
     Map m_map;
     std::unique_ptr<Player> m_player;
     std::vector<std::unique_ptr<Enemy>> m_enemies;
+
+    sf::RenderWindow m_window;
+    sf::Font m_font;
+    bool m_fontLoaded;
+    int m_cellSize;
 };
 
 #endif

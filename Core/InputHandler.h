@@ -1,7 +1,7 @@
 #ifndef INPUT_HANDLER_H
 #define INPUT_HANDLER_H
 
-#include <string>
+#include <SFML/Window/Event.hpp>
 
 enum class Command {
     UP,
@@ -14,7 +14,7 @@ enum class Command {
 
 class InputHandler {
 public:
-    Command handleInput();
+    Command handleEvent(const sf::Event& event);
 };
 
 #endif

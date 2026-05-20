@@ -17,6 +17,7 @@ public:
 
     void initialize();
     std::string render(const std::vector<RenderEntity>& entities) const;
+    char getCell(int x, int y) const;
 
     int getWidth() const { return m_width; }
     int getHeight() const { return m_height; }

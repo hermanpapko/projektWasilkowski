@@ -3,9 +3,17 @@
 #include <random>
 #include <algorithm>
 
-Game::Game() : m_isRunning(true), m_currentCommand(Command::NONE), m_map(20, 10) {
+Game::Game() : m_isRunning(true), m_currentCommand(Command::NONE), m_map(20, 10),
+               m_window(sf::VideoMode(800, 600), "Projekt Wasilkowski"),
+               m_cellSize(32) {
     m_player = std::make_unique<Player>(1, 1, "Hero");
     spawnEnemies(3);
+    
+    m_fontLoaded = m_font.loadFromFile("C:/Windows/Fonts/arial.ttf");
+    if (!m_fontLoaded) {
+        std::cerr << "Warning: Could not load arial.ttf font." << std::endl;
+    }
+
     addLog("Game Started! Controls: WASD to move, Q to quit.");
 }
 
@@ -19,14 +27,29 @@ void Game::addLog(const std::string& message) {
 }
 
 void Game::run() {
-    clearConsole();
-
-    while (m_isRunning) {
-        m_currentCommand = m_inputHandler.handleInput();
-        update();
-        render();
+    while (m_isRunning && m_window.isOpen()) {
+        sf::Event event;
+        while (m_window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                m_window.close();
+                m_isRunning = false;
+            }
+            
+            Command cmd = m_inputHandler.handleEvent(event);
+            if (cmd != Command::NONE) {
+                m_currentCommand = cmd;
+                update();
+            }
+        }
+        
+        if (m_window.isOpen()) {
+            render();
+        }
     }
-
+    
+    if (m_window.isOpen()) {
+        m_window.close();
+    }
     std::cout << "Game Over. Goodbye!" << std::endl;
 }
 
@@ -58,33 +81,22 @@ void Game::spawnEnemies(int count) {
     }
 }
 
+/**
+ * Handles the main game logic including player movement, collision detection, 
+ * combat resolution, and basic turn-based enemy AI updates.
+ */
 void Game::update() {
     int nextX = m_player->getX();
     int nextY = m_player->getY();
 
     switch (m_currentCommand) {
-        case Command::UP:
-            nextY--;
-            break;
-        case Command::DOWN:
-            nextY++;
-            break;
-        case Command::LEFT:
-            nextX--;
-            break;
-        case Command::RIGHT:
-            nextX++;
-            break;
-        case Command::QUIT:
-            m_isRunning = false;
-            break;
+        case Command::UP:    nextY--; break;
+        case Command::DOWN:  nextY++; break;
+        case Command::LEFT:  nextX--; break;
+        case Command::RIGHT: nextX++; break;
+        case Command::QUIT:  m_isRunning = false; return;
         case Command::NONE:
-        default:
-            break;
-    }
-
-    if (m_currentCommand == Command::NONE || m_currentCommand == Command::QUIT) {
-        return;
+        default: return;
     }
 
     bool collision = false;
@@ -92,7 +104,6 @@ void Game::update() {
         if (enemy->getX() == nextX && enemy->getY() == nextY) {
             collision = true;
             
-            // Combat logic
             int playerDamage = m_player->getDamage();
             int enemyDamage = enemy->getDamage();
             
@@ -109,7 +120,6 @@ void Game::update() {
         if (m_map.isWalkable(nextX, nextY)) {
             m_player->setPosition(nextX, nextY);
             
-            // Check Win Condition
             if (m_map.isExit(nextX, nextY)) {
                 m_isRunning = false;
                 addLog("VICTORY! You reached the exit!");
@@ -119,14 +129,12 @@ void Game::update() {
         }
     }
 
-    // Basic Enemy AI: Move enemies if player did something (Turn-based)
     for (auto& enemy : m_enemies) {
         if (enemy->moveRandomly(m_map, m_enemies, *m_player)) {
             addLog("Enemy attacks Player! Both take damage.");
         }
     }
 
-    // Remove dead enemies
     m_enemies.erase(
         std::remove_if(m_enemies.begin(), m_enemies.end(),
             [this](const std::unique_ptr<Enemy>& enemy) { 
@@ -140,7 +148,6 @@ void Game::update() {
         m_enemies.end()
     );
 
-    // Check Player Death
     if (!m_player->isAlive()) {
         m_isRunning = false;
         addLog("PLAYER DIED! Game Over.");
@@ -148,47 +155,89 @@ void Game::update() {
 }
 
 void Game::render() {
-    // Move cursor to 1,1 instead of clearing the whole screen
-    std::cout << "\033[H"; 
-    
-    std::vector<RenderEntity> entities;
-    if (m_player->isAlive()) {
-        entities.push_back({m_player->getX(), m_player->getY(), m_player->getSymbol()});
+    m_window.clear(sf::Color(20, 20, 20));
+
+    int offsetX = 20;
+    int offsetY = 60; // Leave space for HUD at the top
+
+    // Draw Map
+    for (int y = 0; y < m_map.getHeight(); ++y) {
+        for (int x = 0; x < m_map.getWidth(); ++x) {
+            char cell = m_map.getCell(x, y);
+            sf::RectangleShape rect(sf::Vector2f(m_cellSize - 1.0f, m_cellSize - 1.0f));
+            rect.setPosition(offsetX + x * m_cellSize, offsetY + y * m_cellSize);
+
+            if (cell == '#') rect.setFillColor(sf::Color(100, 100, 100));
+            else if (cell == '.') rect.setFillColor(sf::Color(40, 40, 40));
+            else if (cell == '>') rect.setFillColor(sf::Color::Yellow);
+            else rect.setFillColor(sf::Color::Black);
+
+            m_window.draw(rect);
+        }
     }
+
+    // Draw Entities helper
+    auto drawEntity = [&](int x, int y, sf::Color color) {
+        sf::RectangleShape rect(sf::Vector2f(m_cellSize - 4.0f, m_cellSize - 4.0f));
+        rect.setPosition(offsetX + x * m_cellSize + 2.0f, offsetY + y * m_cellSize + 2.0f);
+        rect.setFillColor(color);
+        m_window.draw(rect);
+    };
+
     for (const auto& enemy : m_enemies) {
-        entities.push_back({enemy->getX(), enemy->getY(), enemy->getSymbol()});
+        drawEntity(enemy->getX(), enemy->getY(), sf::Color::Red);
     }
 
-    std::string frame = "\x1b[36m--- Game Engine (Interface) ---\x1b[0m\n";
-    
-    // HUD
-    frame += "\x1b[32mHero: " + m_player->getName() + "\x1b[0m | \x1b[31mHP: " + std::to_string(m_player->getHP()) + 
-             "\x1b[0m | \x1b[33mLevel: " + std::to_string(m_player->getLevel()) + 
-             "\x1b[0m | \x1b[35mScore: " + std::to_string(m_player->getScore()) + "\x1b[0m          \n";
-    frame += "--------------------------------\n";
-
-    frame += m_map.render(entities);
-    
-    frame += "\x1b[34m--- Event Log ---\x1b[0m\n";
-    for (const auto& log : m_eventLog) {
-        frame += log + "                                        \n"; // Padding
+    if (m_player->isAlive()) {
+        drawEntity(m_player->getX(), m_player->getY(), sf::Color::Green);
     }
-    frame += "--------------------------------\n";
-    
-    if (!m_player->isAlive()) {
-        frame += "\x1b[31m        GAME OVER!          \n";
-        frame += "   The Hero has fallen...   \x1b[0m\n";
-    } else if (!m_isRunning && m_map.isExit(m_player->getX(), m_player->getY())) {
-        frame += "\x1b[32m        VICTORY!            \n";
-        frame += "   You escaped the dungeon! \x1b[0m\n";
-    } else {
-        frame += "Press \x1b[31mQ\x1b[0m to quit.                \n";
-    }
-    
-    std::cout << frame << std::flush;
-}
 
-void Game::clearConsole() {
-    // Initial clear only
-    std::cout << "\033[2J\033[H";
+    // Draw Text (HUD and Logs)
+    if (m_fontLoaded) {
+        sf::Text hudText;
+        hudText.setFont(m_font);
+        hudText.setCharacterSize(18);
+        hudText.setFillColor(sf::Color::White);
+        
+        std::string hudString = "Hero: " + m_player->getName() + 
+                                " | HP: " + std::to_string(m_player->getHP()) + 
+                                " | Lvl: " + std::to_string(m_player->getLevel()) + 
+                                " | Score: " + std::to_string(m_player->getScore());
+        hudText.setString(hudString);
+        hudText.setPosition(20, 20);
+        m_window.draw(hudText);
+
+        // Draw Logs at the bottom
+        int logStartY = offsetY + m_map.getHeight() * m_cellSize + 20;
+        sf::Text logText;
+        logText.setFont(m_font);
+        logText.setCharacterSize(16);
+        logText.setFillColor(sf::Color(200, 200, 200));
+
+        for (size_t i = 0; i < m_eventLog.size(); ++i) {
+            logText.setString(m_eventLog[i]);
+            logText.setPosition(20, logStartY + i * 20);
+            m_window.draw(logText);
+        }
+        
+        // Draw End Game / Instructions
+        sf::Text statusText;
+        statusText.setFont(m_font);
+        statusText.setCharacterSize(18);
+        statusText.setPosition(400, 20);
+        
+        if (!m_player->isAlive()) {
+            statusText.setFillColor(sf::Color::Red);
+            statusText.setString("GAME OVER! The Hero has fallen...");
+        } else if (!m_isRunning && m_map.isExit(m_player->getX(), m_player->getY())) {
+            statusText.setFillColor(sf::Color::Yellow);
+            statusText.setString("VICTORY! You escaped!");
+        } else {
+            statusText.setFillColor(sf::Color(150, 150, 150));
+            statusText.setString("Press Q to quit");
+        }
+        m_window.draw(statusText);
+    }
+
+    m_window.display();
 }
