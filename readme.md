@@ -1,14 +1,14 @@
 <h1 align="center">⚔️ Console Dungeon Crawler</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/C%2B%2B-11%2B-blue.svg" alt="C++ Version">
-  <img src="https://img.shields.io/badge/Platform-Windows-lightgrey.svg" alt="Platform">
+  <img src="https://img.shields.io/badge/C%2B%2B-20-blue.svg" alt="C++ Version">
+  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg" alt="Platform">
   <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
 </p>
 
 <p align="center">
-  <b>Console Dungeon Crawler</b> to klasyczna gra typu <i>roguelike</i> napisana w języku C++. 
-  Projekt skupia się na eksploracji lochów, turowej walce oraz zbieraniu skarbów w minimalistycznej oprawie tekstowej.
+  <b>Console Dungeon Crawler</b> to klasyczna gra typu <i>roguelike</i> napisana w C++20. 
+  Projekt skupia się na eksploracji lochów, turowej walce oraz minimalistycznej oprawie tekstowej.
 </p>
 
 <hr>
@@ -18,12 +18,11 @@
   Głównym celem tego projektu jest demonstracja umiejętności programowania obiektowego w C++ oraz biegłości w pracy z systemem kontroli wersji <b>Git</b> w zespole dwuosobowym.
 </p>
 
-<h3>Główne funkcje</h3>
+<h3>Struktura Projektu (OOP)</h3>
 <ul>
-  <li><b>Proceduralna interakcja:</b> dynamiczne reagowanie świata na ruchy gracza.</li>
-  <li><b>System walki:</b> turowa wymiana ciosów z przeciwnikami.</li>
-  <li><b>Zarządzanie zasobami:</b> zbieranie mikstur leczniczych i złota.</li>
-  <li><b>Log zdarzeń:</b> powiadomienia o akcjach w czasie rzeczywistym.</li>
+  <li><b>Core/</b> — Główny silnik gry (Game Loop, Input Handler).</li>
+  <li><b>Entities/</b> — Klasy postaci (Player, Enemy, Entity).</li>
+  <li><b>World/</b> — System mapy i kolizji.</li>
 </ul>
 
 <hr>
@@ -69,24 +68,24 @@
   </thead>
   <tbody>
     <tr>
-      <td><code>@</code></td>
+      <td><code style="color: green">@</code></td>
       <td><b>Gracz</b></td>
-      <td>Twoja postać</td>
+      <td>Twoja postać (Zielony)</td>
     </tr>
     <tr>
-      <td><code>E</code></td>
+      <td><code style="color: red">E</code></td>
       <td><b>Przeciwnik</b></td>
-      <td>Przeciwnik, który może Cię zaatakować</td>
+      <td>Przeciwnik (Czerwony)</td>
     </tr>
     <tr>
-      <td><code>#</code></td>
+      <td><code style="color: gray">#</code></td>
       <td><b>Ściana</b></td>
-      <td>Nieprzekraczalna przeszkoda</td>
+      <td>Przeszkoda (Szary)</td>
     </tr>
     <tr>
-      <td><code>+</code></td>
-      <td><b>Apteczka</b></td>
-      <td>Mikstura przywracająca HP</td>
+      <td><code style="color: gold">></code></td>
+      <td><b>Wyjście</b></td>
+      <td>Cel gry (Złoty)</td>
     </tr>
   </tbody>
 </table>
@@ -95,28 +94,33 @@
 
 <h2>Instalacja i Kompilacja</h2>
 
-<details>
-<summary><b>Kliknij, aby rozwinąć instrukcję</b></summary>
+<p>Projekt korzysta z systemu <b>CMake</b> (min. wersja 4.2). Aby skompilować grę, użyj poniższych komend:</p>
 
 <pre>
-# 1. Sklonuj repozytorium
-git clone https://github.com/twoj-login/dungeon-crawler.git
+# 1. Stwórz katalog dla plików budowy
+mkdir build
+cd build
 
-# 2. Skompiluj kod
-g++ main.cpp -o DungeonGame.exe
+# 2. Skonfiguruj projekt
+cmake ..
 
-# 3. Uruchom grę
-./DungeonGame.exe
+# 3. Skompiluj kod
+make
+
+# 4. Uruchom grę
+./projektWasilkowski
+
+# 5. Uruchom testy
+./run_tests
 </pre>
-</details>
 
 <hr>
 
 <h2>Zespół</h2>
 <p>Projekt został zrealizowany przy użyciu modelu <b>Feature Branching</b>.</p>
 <ul>
-  <li><b>Herman Papko</b> Silnik graficzny, system mapy.</li>
-  <li><b>Darya Parusava</b> Logika walki, system przedmiotów.</li>
+  <li><b>Herman Papko</b> — Silnik graficzny, system mapy, UI.</li>
+  <li><b>Darya Parusava</b> — Logika walki, system bytów.</li>
 </ul>
 
 <p align="right"><i>Projekt stworzony na potrzeby zaliczenia przedmiotu Programowanie C++.</i></p>
