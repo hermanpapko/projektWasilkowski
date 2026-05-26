@@ -46,16 +46,20 @@ void Map::initialize() {
 }
 
 std::string Map::render(const std::vector<RenderEntity>& entities) const {
-    std::string result = "";
+    // Optimization: Reserve memory to avoid multiple reallocations
+    // Formula: (width + 1) * height + estimate for color codes
+    std::string result;
+    result.reserve((m_width + 1) * m_height + 512); 
+
     for (int y = 0; y < m_height; ++y) {
         for (int x = 0; x < m_width; ++x) {
             char symbol = m_grid[y][x];
-            std::string colorPrefix = "";
+            const char* colorPrefix = nullptr;
             
             // Determine color for the base map cell
             if (symbol == '#') colorPrefix = ANSI_COLOR_GRAY;
             else if (symbol == '>') colorPrefix = ANSI_COLOR_YELLOW;
-            else if (symbol == '.') colorPrefix = ""; // Default floor
+            // else if (symbol == '.') colorPrefix = nullptr; // Default floor
 
             // Check if any entity is at this position
             for (const auto& entity : entities) {
@@ -67,13 +71,15 @@ std::string Map::render(const std::vector<RenderEntity>& entities) const {
                 }
             }
             
-            if (colorPrefix != "") {
-                result += colorPrefix + symbol + ANSI_COLOR_RESET;
+            if (colorPrefix) {
+                result.append(colorPrefix);
+                result.push_back(symbol);
+                result.append(ANSI_COLOR_RESET);
             } else {
-                result += symbol;
+                result.push_back(symbol);
             }
         }
-        result += "\n";
+        result.push_back('\n');
     }
     return result;
 }
