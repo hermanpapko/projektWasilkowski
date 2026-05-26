@@ -27,6 +27,18 @@ add_executable(projektWasilkowski
 
 target_link_libraries(projektWasilkowski PRIVATE sfml-graphics sfml-window sfml-system)
 
+# Static linking for Windows to make the .exe portable
+if(WIN32)
+    if(MSVC)
+        # For Visual Studio: use static runtime library
+        set_target_properties(projektWasilkowski PROPERTIES
+            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    else()
+        # For MinGW/GCC: use static flags
+        target_link_libraries(projektWasilkowski PRIVATE "-static-libgcc" "-static-libstdc++" "-static")
+    endif()
+endif()
+
 # Test executable
 add_executable(run_tests 
     tests.cpp 
