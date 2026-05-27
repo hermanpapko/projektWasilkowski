@@ -10,6 +10,7 @@ bool Enemy::moveRandomly(const Map& map, const std::vector<std::unique_ptr<Enemy
     static std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 4); // 0: Stay, 1: Up, 2: Down, 3: Left, 4: Right
 
+    // Select a random direction
     int dir = dis(gen);
     int nextX = m_x;
     int nextY = m_y;
@@ -22,11 +23,12 @@ bool Enemy::moveRandomly(const Map& map, const std::vector<std::unique_ptr<Enemy
         default: break; // Stay put
     }
 
+    // Check if the target tile is a wall or out of bounds
     if (!map.isWalkable(nextX, nextY)) {
         return false;
     }
 
-    // Check collision with player
+    // Check collision with player for combat initiation
     if (nextX == player.getX() && nextY == player.getY()) {
         // Combat logic: Enemy attacks player, player counter-attacks
         player.takeDamage(m_damage);
@@ -34,6 +36,7 @@ bool Enemy::moveRandomly(const Map& map, const std::vector<std::unique_ptr<Enemy
         return true;
     }
 
+    // Ensure we don't step on another enemy
     bool occupied = false;
     for (const auto& other : enemies) {
         if (other.get() != this && other->getX() == nextX && other->getY() == nextY) {
@@ -42,6 +45,7 @@ bool Enemy::moveRandomly(const Map& map, const std::vector<std::unique_ptr<Enemy
         }
     }
 
+    // If the tile is free, move there
     if (!occupied) {
         m_x = nextX;
         m_y = nextY;

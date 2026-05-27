@@ -20,11 +20,22 @@ public:
     Entity(int x, int y, char symbol, int hp, int damage);
     virtual ~Entity() = default;
 
+    /** @brief Gets the current X coordinate. */
     int getX() const { return m_x; }
+    
+    /** @brief Gets the current Y coordinate. */
     int getY() const { return m_y; }
+    
+    /** @brief Gets the entity's symbol character. */
     char getSymbol() const { return m_symbol; }
+    
+    /** @brief Gets the current health points. */
     int getHP() const { return m_hp; }
+    
+    /** @brief Gets the maximum health points. */
     int getMaxHP() const { return m_maxHp; }
+    
+    /** @brief Gets the attack damage. */
     int getDamage() const { return m_damage; }
 
     /**
