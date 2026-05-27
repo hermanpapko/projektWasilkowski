@@ -96,6 +96,7 @@
 
 <p>Projekt korzysta z systemu <b>CMake</b> (min. wersja 4.2). Aby skompilować grę, użyj poniższych komend:</p>
 
+<<<<<<< HEAD
 <pre>
 # 1. Stwórz katalog dla plików budowy
 mkdir build
@@ -113,6 +114,43 @@ make
 # 5. Uruchom testy
 ./run_tests
 </pre>
+=======
+### Wymagania
+* Kompilator C++ wspierający standard **C++20** (np. GCC 10+, Clang 10+, MSVC 2019+).
+* **CMake** (wersja 3.14 lub nowsza).
+* Biblioteka **SFML** (zostanie pobrana automatycznie przez CMake).
+
+### Instrukcja kompilacji
+1. **Sklonuj repozytorium:**
+   ```bash
+   git clone https://github.com/twoj-login/dungeon-crawler.git
+   cd dungeon-crawler
+   ```
+
+2. **Skonfiguruj projekt za pomocą CMake:**
+   ```bash
+   mkdir build
+   cd build
+   cmake ..
+   ```
+
+3. **Skompiluj kod:**
+   ```bash
+   cmake --build .
+   ```
+
+4. **Uruchom grę:**
+   ```bash
+   ./projektWasilkowski
+   ```
+
+### Uruchamianie testów
+Aby uruchomić testy jednostkowe:
+```bash
+./run_tests
+```
+</details>
+>>>>>>> 1763d7c (fix: prevent negative HP values)
 
 <hr>
 

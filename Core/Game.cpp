@@ -3,9 +3,10 @@
 #include <random>
 #include <algorithm>
 
-Game::Game() : m_isRunning(true), m_currentCommand(Command::NONE), m_map(20, 10),
+Game::Game() : m_isRunning(true), m_isGameOver(false), m_currentCommand(Command::NONE), m_map(20, 10),
                m_window(sf::VideoMode(800, 600), "Projekt Wasilkowski"),
                m_cellSize(32) {
+    m_window.setFramerateLimit(60);
     m_player = std::make_unique<Player>(1, 1, "Hero");
     spawnEnemies(3);
     
@@ -14,11 +15,16 @@ Game::Game() : m_isRunning(true), m_currentCommand(Command::NONE), m_map(20, 10)
         std::cerr << "Warning: Could not load arial.ttf font." << std::endl;
     }
 
+    initMapVertices();
     addLog("Game Started! Controls: WASD to move, Q to quit.");
 }
 
 Game::~Game() {}
 
+/**
+ * @brief Adds a new message to the event log.
+ * Keeps only the last 5 messages.
+ */
 void Game::addLog(const std::string& message) {
     m_eventLog.push_back(message);
     if (m_eventLog.size() > 5) {
@@ -26,17 +32,24 @@ void Game::addLog(const std::string& message) {
     }
 }
 
+/**
+ * @brief Main game loop.
+ * Handles event polling, logic updates, and rendering.
+ */
 void Game::run() {
-    while (m_isRunning && m_window.isOpen()) {
+    while (m_window.isOpen()) {
         sf::Event event;
         while (m_window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 m_window.close();
-                m_isRunning = false;
             }
             
             Command cmd = m_inputHandler.handleEvent(event);
-            if (cmd != Command::NONE) {
+            if (cmd == Command::QUIT) {
+                m_window.close();
+            }
+
+            if (m_isRunning && !m_isGameOver && cmd != Command::NONE) {
                 m_currentCommand = cmd;
                 update();
             }
@@ -47,9 +60,6 @@ void Game::run() {
         }
     }
     
-    if (m_window.isOpen()) {
-        m_window.close();
-    }
     std::cout << "Game Over. Goodbye!" << std::endl;
 }
 
@@ -82,7 +92,38 @@ void Game::spawnEnemies(int count) {
 }
 
 /**
- * Handles the main game logic including player movement, collision detection, 
+ * @brief Pre-calculates map vertices for optimized rendering.
+ */
+void Game::initMapVertices() {
+    m_mapVertices.setPrimitiveType(sf::Quads);
+    m_mapVertices.resize(m_map.getWidth() * m_map.getHeight() * 4);
+
+    int offsetX = 20;
+    int offsetY = 60;
+
+    for (int y = 0; y < m_map.getHeight(); ++y) {
+        for (int x = 0; x < m_map.getWidth(); ++x) {
+            sf::Vertex* quad = &m_mapVertices[(x + y * m_map.getWidth()) * 4];
+
+            quad[0].position = sf::Vector2f(offsetX + x * m_cellSize, offsetY + y * m_cellSize);
+            quad[1].position = sf::Vector2f(offsetX + (x + 1) * m_cellSize - 1, offsetY + y * m_cellSize);
+            quad[2].position = sf::Vector2f(offsetX + (x + 1) * m_cellSize - 1, offsetY + (y + 1) * m_cellSize - 1);
+            quad[3].position = sf::Vector2f(offsetX + x * m_cellSize, offsetY + (y + 1) * m_cellSize - 1);
+
+            char cell = m_map.getCell(x, y);
+            sf::Color color;
+            if (cell == '#') color = sf::Color(100, 100, 100);
+            else if (cell == '.') color = sf::Color(40, 40, 40);
+            else if (cell == '>') color = sf::Color::Yellow;
+            else color = sf::Color::Black;
+
+            for (int i = 0; i < 4; ++i) quad[i].color = color;
+        }
+    }
+}
+
+/**
+ * @brief Handles the main game logic including player movement, collision detection, 
  * combat resolution, and basic turn-based enemy AI updates.
  */
 void Game::update() {
@@ -94,7 +135,6 @@ void Game::update() {
         case Command::DOWN:  nextY++; break;
         case Command::LEFT:  nextX--; break;
         case Command::RIGHT: nextX++; break;
-        case Command::QUIT:  m_isRunning = false; return;
         case Command::NONE:
         default: return;
     }
@@ -122,6 +162,7 @@ void Game::update() {
             
             if (m_map.isExit(nextX, nextY)) {
                 m_isRunning = false;
+                m_isGameOver = true;
                 addLog("VICTORY! You reached the exit!");
             }
         } else {
@@ -150,31 +191,23 @@ void Game::update() {
 
     if (!m_player->isAlive()) {
         m_isRunning = false;
+        m_isGameOver = true;
         addLog("PLAYER DIED! Game Over.");
     }
 }
 
+/**
+ * @brief Renders the current game state to the SFML window.
+ * Draws the map, enemies, player, and UI (HUD and logs).
+ */
 void Game::render() {
     m_window.clear(sf::Color(20, 20, 20));
 
     int offsetX = 20;
     int offsetY = 60; // Leave space for HUD at the top
 
-    // Draw Map
-    for (int y = 0; y < m_map.getHeight(); ++y) {
-        for (int x = 0; x < m_map.getWidth(); ++x) {
-            char cell = m_map.getCell(x, y);
-            sf::RectangleShape rect(sf::Vector2f(m_cellSize - 1.0f, m_cellSize - 1.0f));
-            rect.setPosition(offsetX + x * m_cellSize, offsetY + y * m_cellSize);
-
-            if (cell == '#') rect.setFillColor(sf::Color(100, 100, 100));
-            else if (cell == '.') rect.setFillColor(sf::Color(40, 40, 40));
-            else if (cell == '>') rect.setFillColor(sf::Color::Yellow);
-            else rect.setFillColor(sf::Color::Black);
-
-            m_window.draw(rect);
-        }
-    }
+    // Draw Map (Optimized)
+    m_window.draw(m_mapVertices);
 
     // Draw Entities helper
     auto drawEntity = [&](int x, int y, sf::Color color) {
@@ -200,7 +233,7 @@ void Game::render() {
         hudText.setFillColor(sf::Color::White);
         
         std::string hudString = "Hero: " + m_player->getName() + 
-                                " | HP: " + std::to_string(m_player->getHP()) + 
+                                " | HP: " + std::to_string(m_player->getHP()) + "/" + std::to_string(m_player->getMaxHP()) +
                                 " | Lvl: " + std::to_string(m_player->getLevel()) + 
                                 " | Score: " + std::to_string(m_player->getScore());
         hudText.setString(hudString);
