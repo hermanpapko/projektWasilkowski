@@ -1,28 +1,29 @@
-<h1 align="center">⚔️ Console Dungeon Crawler</h1>
+<h1 align="center">⚔️ SFML Dungeon Crawler</h1>
 
 <p align="center">
   <img src="https://img.shields.io/badge/C%2B%2B-20-blue.svg" alt="C++ Version">
   <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg" alt="Platform">
+  <img src="https://img.shields.io/badge/Library-SFML%202.6-green.svg" alt="SFML Version">
   <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
 </p>
 
 <p align="center">
-  <b>Console Dungeon Crawler</b> to klasyczna gra typu <i>roguelike</i> napisana w C++20. 
-  Projekt skupia się na eksploracji lochów, turowej walce oraz minimalistycznej oprawie tekstowej.
+  <b>SFML Dungeon Crawler</b> to gra typu <i>roguelike</i> napisana w <b>C++20</b>. 
+  Projekt przeszedł gruntowną aktualizację i obecnie wykorzystuje bibliotekę <b>SFML</b> do renderowania okienkowego, zastępując wcześniejszą, czysto konsolową oprawę wizualną.
 </p>
 
 <hr>
 
 <h2>O projekcie</h2>
 <p>
-  Głównym celem tego projektu jest demonstracja umiejętności programowania obiektowego w C++ oraz biegłości w pracy z systemem kontroli wersji <b>Git</b> w zespole dwuosobowym.
+  Głównym celem tego projektu jest demonstracja umiejętności programowania obiektowego (OOP) w C++ oraz biegłości w pracy zespołowej z wykorzystaniem systemu <b>Git</b>. Gra zawiera system poziomów, walki z przeciwnikami, log zdarzeń oraz zoptymalizowane renderowanie mapy oparte na bibliotece SFML.
 </p>
 
-<h3>Struktura Projektu (OOP)</h3>
+<h3>Struktura Projektu</h3>
 <ul>
-  <li><b>Core/</b> — Główny silnik gry (Game Loop, Input Handler).</li>
-  <li><b>Entities/</b> — Klasy postaci (Player, Enemy, Entity).</li>
-  <li><b>World/</b> — System mapy i kolizji.</li>
+  <li><b>Core/</b> — Główny silnik gry (Game Loop, Input Handler, renderowanie w oknie).</li>
+  <li><b>Entities/</b> — Klasy bytów (gracz z systemem poziomów i punktacją, przeciwnicy).</li>
+  <li><b>World/</b> — System zarządzania mapą i kolizjami, zoptymalizowane rysowanie (Vertex Array).</li>
 </ul>
 
 <hr>
@@ -34,131 +35,74 @@
     <th>Akcja</th>
   </tr>
   <tr>
-    <td align="center"><b>W</b></td>
+    <td align="center"><b>W / Strzałka w górę</b></td>
     <td>Ruch w górę</td>
   </tr>
   <tr>
-    <td align="center"><b>S</b></td>
+    <td align="center"><b>S / Strzałka w dół</b></td>
     <td>Ruch w dół</td>
   </tr>
   <tr>
-    <td align="center"><b>A</b></td>
+    <td align="center"><b>A / Strzałka w lewo</b></td>
     <td>Ruch w lewo</td>
   </tr>
   <tr>
-    <td align="center"><b>D</b></td>
+    <td align="center"><b>D / Strzałka w prawo</b></td>
     <td>Ruch w prawo</td>
   </tr>
   <tr>
-    <td align="center"><b>Q</b></td>
+    <td align="center"><b>ESC / Q</b></td>
     <td>Wyjście z gry</td>
   </tr>
 </table>
 
 <hr>
 
-<h2>Legenda Mapy</h2>
-<table>
-  <thead>
-    <tr>
-      <th>Symbol</th>
-      <th>Znaczenie</th>
-      <th>Opis</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code style="color: green">@</code></td>
-      <td><b>Gracz</b></td>
-      <td>Twoja postać (Zielony)</td>
-    </tr>
-    <tr>
-      <td><code style="color: red">E</code></td>
-      <td><b>Przeciwnik</b></td>
-      <td>Przeciwnik (Czerwony)</td>
-    </tr>
-    <tr>
-      <td><code style="color: gray">#</code></td>
-      <td><b>Ściana</b></td>
-      <td>Przeszkoda (Szary)</td>
-    </tr>
-    <tr>
-      <td><code style="color: gold">></code></td>
-      <td><b>Wyjście</b></td>
-      <td>Cel gry (Złoty)</td>
-    </tr>
-  </tbody>
-</table>
+<h2>Wymagania</h2>
+<ul>
+  <li>Kompilator C++ wspierający standard <b>C++20</b> (np. GCC 10+, Clang 10+, MSVC 2019+).</li>
+  <li><b>CMake</b> (wersja 3.14 lub nowsza).</li>
+  <li>Zależności <b>SFML</b> (wersja 2.6.x) zostaną pobrane i skonfigurowane w pełni automatycznie podczas budowania projektu (dzięki <code>FetchContent</code>). Na systemach Windows biblioteka linkuje się statycznie, zapewniając gotowy, łatwo przenaszalny plik <code>.exe</code> bez dodatkowych bibliotek DLL.</li>
+</ul>
 
 <hr>
 
 <h2>Instalacja i Kompilacja</h2>
 
-<p>Projekt korzysta z systemu <b>CMake</b> (min. wersja 4.2). Aby skompilować grę, użyj poniższych komend:</p>
+<p>Projekt korzysta z systemu <b>CMake</b>. Postępuj zgodnie z poniższymi krokami:</p>
 
-<<<<<<< HEAD
 <pre>
-# 1. Stwórz katalog dla plików budowy
+# 1. Sklonuj repozytorium (lub wejdź do katalogu projektu)
+git clone https://github.com/twoj-login/projektWasilkowski.git
+cd projektWasilkowski
+
+# 2. Stwórz katalog dla plików budowy i przejdź do niego
 mkdir build
 cd build
 
-# 2. Skonfiguruj projekt
+# 3. Skonfiguruj projekt
 cmake ..
 
-# 3. Skompiluj kod
-make
+# 4. Skompiluj kod
+cmake --build .
 
-# 4. Uruchom grę
+# 5. Uruchom grę
 ./projektWasilkowski
+</pre>
 
-# 5. Uruchom testy
+<h3>Uruchamianie testów</h3>
+<p>W projekcie znajdują się testy jednostkowe. Aby je uruchomić, użyj polecenia (będąc w utworzonym katalogu <code>build</code>):</p>
+<pre>
 ./run_tests
 </pre>
-=======
-### Wymagania
-* Kompilator C++ wspierający standard **C++20** (np. GCC 10+, Clang 10+, MSVC 2019+).
-* **CMake** (wersja 3.14 lub nowsza).
-* Biblioteka **SFML** (zostanie pobrana automatycznie przez CMake).
-
-### Instrukcja kompilacji
-1. **Sklonuj repozytorium:**
-   ```bash
-   git clone https://github.com/twoj-login/dungeon-crawler.git
-   cd dungeon-crawler
-   ```
-
-2. **Skonfiguruj projekt za pomocą CMake:**
-   ```bash
-   mkdir build
-   cd build
-   cmake ..
-   ```
-
-3. **Skompiluj kod:**
-   ```bash
-   cmake --build .
-   ```
-
-4. **Uruchom grę:**
-   ```bash
-   ./projektWasilkowski
-   ```
-
-### Uruchamianie testów
-Aby uruchomić testy jednostkowe:
-```bash
-./run_tests
-```
-</details>
->>>>>>> 1763d7c (fix: prevent negative HP values)
 
 <hr>
 
 <h2>Zespół</h2>
 <p>Projekt został zrealizowany przy użyciu modelu <b>Feature Branching</b>.</p>
 <ul>
-  <li><b>Herman Papko</b> — Silnik graficzny, system mapy, UI.</li>
-  <li><b>Darya Parusava</b> — Logika walki, system bytów.</li>
+  <li><b>Herman Papko</b> — Silnik graficzny i obsługa okna (SFML), mechanika mapy i interfejs UI.</li>
+  <li><b>Darya Parusava</b> — Logika i mechanika walki, rozbudowa systemu klas Entities, blokada ujemnego HP, komentarze strukturalne Doxygen.</li>
 </ul>
 
 <p align="right"><i>Projekt stworzony na potrzeby zaliczenia przedmiotu Programowanie C++.</i></p>
